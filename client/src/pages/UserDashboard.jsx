@@ -12,20 +12,22 @@ function UserDashboard() {
   const [wallet, setWallet] = useState(0);
   const [stocks, setStocks] = useState([]);
   const [roiData, setRoiData] = useState([]);
-
   const [buyAmount, setBuyAmount] = useState({}); // { [stockId]: amount }
 
+  // 🔹 Buy Stock
   const buyStock = async (stockId) => {
     const amount = Number(buyAmount[stockId] || 0);
     if (!amount || amount <= 0) return alert("Enter a valid amount");
 
     try {
       await API.post(`/stocks/buy/${stockId}`, { amount });
-      // refresh wallet, roi
+
+      // refresh wallet & ROI
       const u = await API.get("/users/me");
       setWallet(u.data?.walletBalance || 0);
       const roi = await API.get("/roi");
       setRoiData(roi.data || []);
+
       setBuyAmount((prev) => ({ ...prev, [stockId]: "" }));
       alert("✅ Purchase completed");
     } catch (err) {
@@ -33,6 +35,23 @@ function UserDashboard() {
     }
   };
 
+  // 🔹 Sell Stock
+  const sellStock = async (stockId, amount) => {
+    try {
+      const res = await API.post(`/stocks/sell/${stockId}`, { amount });
+      alert(res.data.message);
+
+      // refresh wallet & ROI
+      const u = await API.get("/users/me");
+      setWallet(u.data?.walletBalance || 0);
+      const roi = await API.get("/roi");
+      setRoiData(roi.data || []);
+    } catch (err) {
+      alert("❌ " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  // 🔹 Initial Data Fetch
   useEffect(() => {
     API.get("/users/me").then((res) => setWallet(res.data?.walletBalance || 0));
     API.get("/stocks").then((res) => setStocks(res.data));
@@ -41,6 +60,7 @@ function UserDashboard() {
       .catch(() => setRoiData([]));
   }, []);
 
+  // 🔹 Logout
   const handleLogout = () => {
     logout(); // clears context + localStorage
     navigate("/login", { replace: true });
@@ -72,7 +92,7 @@ function UserDashboard() {
         {stocks.map((s) => (
           <div
             key={s._id}
-            className="p-4 bg-white rounded-lg shadow-md flex justify-between"
+            className="p-4 bg-white rounded-lg shadow-md flex justify-between items-center"
           >
             <div>
               <h3 className="font-bold">{s.name}</h3>
@@ -115,6 +135,7 @@ function UserDashboard() {
                 <th className="p-3">ROI %</th>
                 <th className="p-3">Purchase Date</th>
                 <th className="p-3">Profit</th>
+                <th className="p-3">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -128,6 +149,14 @@ function UserDashboard() {
                   </td>
                   <td className="p-3 font-semibold text-green-600">
                     ₹{r.profit}
+                  </td>
+                  <td className="p-3">
+                    <button
+                      onClick={() => sellStock(r.stockId, r.amount)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    >
+                      Sell
+                    </button>
                   </td>
                 </tr>
               ))}

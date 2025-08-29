@@ -13,6 +13,7 @@ import ManagePayments from "./pages/ManagePayments";
 import ManageUPI from "./pages/ManageUPI";
 import ApprovedPayments from "./pages/ApprovedPayments";
 import RejectedPayments from "./pages/RejectedPayments";
+import ManageWithdraws from "./pages/ManageWithdraws";
 
 function AppRoutes() {
   const { token, role } = useContext(AuthContext);
@@ -103,6 +104,16 @@ function AppRoutes() {
         element={
           token && role === "admin" ? (
             <RejectedPayments />
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/admin/withdraws"
+        element={
+          token && role === "admin" ? (
+            <ManageWithdraws />
           ) : (
             <Navigate to="/login" />
           )

@@ -32,6 +32,13 @@ function AdminDashboard() {
         </Link>
 
         <Link
+          to="/admin/withdraws"
+          className="bg-yellow-500 text-white p-6 rounded-xl shadow hover:bg-yellow-600 text-center font-semibold"
+        >
+          💸 Manage Withdrawals
+        </Link>
+
+        <Link
           to="/admin/payments"
           className="bg-green-500 text-white p-6 rounded-xl shadow hover:bg-green-600 text-center font-semibold"
         >
@@ -40,13 +47,13 @@ function AdminDashboard() {
 
         <Link
           to="/admin/approved-payments"
-          className="text-green-600 hover:underline"
+          className=" bg-teal-500 text-white p-6 rounded-xl shadow hover:bg-teal-600 text-center font-semibold"
         >
           Approved Payments
         </Link>
         <Link
           to="/admin/rejected-payments"
-          className="text-red-600 hover:underline"
+          className=" bg-pink-500 text-white p-6 rounded-xl shadow hover:bg-pink-600 text-center font-semibold"
         >
           Rejected Payments
         </Link>

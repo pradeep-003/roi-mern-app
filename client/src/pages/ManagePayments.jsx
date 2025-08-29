@@ -5,7 +5,7 @@ function ManagePayments() {
   const [payments, setPayments] = useState([]);
 
   const fetchPayments = async () => {
-    const res = await API.get("/payments"); // make sure backend GET /payments is available
+    const res = await API.get("/payments");
     setPayments(res.data);
   };
 
@@ -14,9 +14,16 @@ function ManagePayments() {
   }, []);
 
   const updateStatus = async (id, status) => {
-    await API.put(`/payments/${id}/status`, { status });
-    fetchPayments();
-    alert(`✅ Payment ${status}`);
+    try {
+      await API.put(`/payments/${id}/status`, { status });
+
+      // ✅ Remove from list instantly
+      setPayments((prev) => prev.filter((p) => p._id !== id));
+
+      alert(`✅ Payment ${status}`);
+    } catch (err) {
+      alert("❌ " + (err.response?.data?.message || err.message));
+    }
   };
 
   return (
@@ -26,7 +33,7 @@ function ManagePayments() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ul>
           {payments
-            .filter((p) => p.status === "pending") // ✅ only show pending
+            .filter((p) => p.status === "pending") // ✅ show only pending
             .map((p) => (
               <li
                 key={p._id}

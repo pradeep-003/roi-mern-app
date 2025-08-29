@@ -5,6 +5,7 @@ import Payment from "../models/Payment.js";
 import Settings from "../models/Settings.js";
 import User from "../models/User.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import Transaction from "../models/Transaction.js";
 
 const router = express.Router();
 
@@ -75,27 +76,36 @@ router.put("/:id/status", authMiddleware(["admin"]), async (req, res) => {
     }
 
     payment.status = status;
+    payment.processed = true;
+
     if (status === "approved") {
       payment.approvedAt = new Date();
 
-      // Credit wallet
+      // ✅ Fetch user first
       const user = await User.findById(payment.userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      // ✅ Create transaction
+      await Transaction.create({
+        userId: user._id,
+        amount: payment.amount,
+        type: "deposit",
+        status: "completed",
+      });
+
+      // ✅ Credit wallet
       user.walletBalance = (user.walletBalance || 0) + Number(payment.amount);
       await user.save();
-
-      payment.processed = true;
-      await payment.save();
-      return res.json({
-        message: "Payment approved & wallet credited",
-        payment,
-      });
-    } else if (status === "rejected") {
-      payment.processed = true;
-      await payment.save();
-      return res.json({ message: "Payment rejected", payment });
     }
 
-    res.status(400).json({ message: "Invalid status" });
+    await payment.save();
+    res.json({
+      message:
+        status === "approved"
+          ? "Payment approved & wallet credited"
+          : "Payment rejected",
+      payment,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

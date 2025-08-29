@@ -92,7 +92,8 @@ router.post("/buy/:stockId", authMiddleware(["user"]), async (req, res) => {
   }
 });
 
-// USER: Sell stock (simplified: credit immediately)
+// USER: Sell stock (credit wallet with principal + ROI profit)
+// USER: Sell stock (credit wallet with principal + ROI profit)
 router.post("/sell/:stockId", authMiddleware(["user"]), async (req, res) => {
   try {
     const { amount } = req.body;
@@ -104,21 +105,51 @@ router.post("/sell/:stockId", authMiddleware(["user"]), async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // credit wallet
-    user.walletBalance = (user.walletBalance || 0) + Number(amount);
-    await user.save();
-
-    const transaction = await Transaction.create({
+    // 🔍 Find a matching unsold buy transaction
+    const buyTxn = await Transaction.findOne({
       userId: req.user.id,
       stockId,
-      amount: Number(amount),
+      type: "buy",
+      status: "completed",
+      sold: false, // 🆕 only active investments
+    }).sort({ createdAt: 1 });
+
+    if (!buyTxn) {
+      return res.status(400).json({ message: "No active investment found" });
+    }
+
+    const stock = await Stock.findById(stockId);
+    if (!stock) return res.status(404).json({ message: "Stock not found" });
+
+    const { calculateROI } = await import("../utils/roiCalculator.js");
+    const profit = calculateROI(
+      buyTxn.amount,
+      stock.roiPercentage,
+      buyTxn.purchaseDate
+    );
+
+    const totalCredit = buyTxn.amount + Number(profit);
+
+    // ✅ Credit wallet
+    user.walletBalance = (user.walletBalance || 0) + totalCredit;
+    await user.save();
+
+    // Mark buy transaction as sold
+    buyTxn.sold = true; // 🆕
+    await buyTxn.save();
+
+    // Record sell transaction
+    const sellTxn = await Transaction.create({
+      userId: req.user.id,
+      stockId,
+      amount: totalCredit,
       type: "sell",
       status: "completed",
     });
 
     res.status(201).json({
-      message: "Sell completed",
-      transaction,
+      message: `Sell completed. You earned ₹${profit} profit.`,
+      transaction: sellTxn,
       walletBalance: user.walletBalance,
     });
   } catch (err) {

@@ -7,20 +7,21 @@ const transactionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    stockId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Stock",
+    stockId: { type: mongoose.Schema.Types.ObjectId, ref: "Stock" },
+    amount: { type: Number, required: true },
+    type: {
+      type: String,
+      enum: ["buy", "sell", "deposit", "withdraw"],
       required: true,
     },
-    amount: { type: Number, required: true },
-    type: { type: String, enum: ["buy", "sell"], required: true },
     status: {
       type: String,
-      enum: ["pending", "completed"],
+      enum: ["pending", "completed", "refunded"],
       default: "pending",
     },
+    sold: { type: Boolean, default: false }, // 🆕 NEW FIELD
     paymentScreenshot: { type: String },
-    purchaseDate: { type: Date, default: Date.now }, // ✅ Added
+    purchaseDate: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

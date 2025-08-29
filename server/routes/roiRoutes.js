@@ -13,6 +13,7 @@ router.get("/", authMiddleware(["user"]), async (req, res) => {
       userId: req.user.id,
       type: "buy",
       status: "completed",
+      sold: false, // 🆕 only active ones
     }).populate("stockId");
 
     const result = transactions.map((t) => {
@@ -22,6 +23,7 @@ router.get("/", authMiddleware(["user"]), async (req, res) => {
         t.purchaseDate
       );
       return {
+        stockId: t.stockId._id, // 🆕 needed for sell
         stock: t.stockId.name,
         amount: t.amount,
         roiPercentage: t.stockId.roiPercentage,
