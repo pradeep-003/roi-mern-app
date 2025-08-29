@@ -27,7 +27,7 @@ const ApprovedPayments = () => {
         <tbody>
           {payments.map((p) => (
             <tr key={p._id} className="text-center">
-              <td className="border p-2">{p.userId?.username}</td>
+              <td className="border p-2">{p.userId?.name}</td>
               <td className="border p-2">₹{p.amount}</td>
               <td className="border p-2">
                 <a

@@ -152,7 +152,7 @@ router.get("/approved", authMiddleware(["admin"]), async (req, res) => {
   try {
     const payments = await Payment.find({ status: "approved" }).populate(
       "userId",
-      "username email"
+      "name email"
     );
     res.json(payments);
   } catch (err) {
@@ -165,7 +165,7 @@ router.get("/rejected", authMiddleware(["admin"]), async (req, res) => {
   try {
     const payments = await Payment.find({ status: "rejected" }).populate(
       "userId",
-      "username email"
+      "name email"
     );
     res.json(payments);
   } catch (err) {
