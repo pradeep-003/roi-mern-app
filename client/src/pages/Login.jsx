@@ -10,7 +10,7 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const res = await API.post("api/auth/login", form);
+      const res = await API.post("/auth/login", form);
       const { token, role } = res.data;
 
       // update context + localStorage
