@@ -9,7 +9,13 @@ const paymentSchema = new mongoose.Schema(
     },
     method: { type: String, required: true }, // UPI/QR
     amount: { type: Number, required: true }, // ✅ add amount to credit wallet
+    // ...existing imports
+
     screenshot: { type: String },
+    screenshotUrl: { type: String },
+    screenshotPublicId: { type: String },
+    // ...rest
+
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

@@ -70,7 +70,14 @@ function ManageUPI() {
               UPI: <span className="font-mono">{settings.upiId}</span>
             </p>
           )}
-          {settings.qrImage && (
+          {settings.qrImageUrl && (
+            <img
+              src={settings.qrImageUrl}
+              alt="QR"
+              className="w-40 mt-2 border rounded"
+            />
+          )}
+          {!settings.qrImageUrl && settings.qrImage && (
             <img
               src={`http://localhost:5000/uploads/${settings.qrImage}`}
               alt="QR"

@@ -7,6 +7,12 @@ import User from "../models/User.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import Transaction from "../models/Transaction.js";
 
+// NEW
+import {
+  uploadBufferToCloudinary,
+  deleteFromCloudinary,
+} from "../utils/uploadBuffer.js";
+
 const router = express.Router();
 
 // -------- Multer storage (screenshots + QR) ----------
@@ -16,7 +22,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + path.extname(file.originalname)),
 });
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter: (req, file, cb) => {
     const ok = /jpeg|jpg|png/.test(
       path.extname(file.originalname).toLowerCase()
@@ -37,11 +43,25 @@ router.post(
         return res.status(400).json({ message: "Valid amount required" });
       }
 
+      let screenshotUrl = null;
+      let screenshotPublicId = null;
+
+      if (req.file?.buffer) {
+        const result = await uploadBufferToCloudinary(
+          req.file.buffer,
+          "roi-mern/screenshots"
+        );
+        screenshotUrl = result.secure_url;
+        screenshotPublicId = result.public_id;
+      }
+
       const payment = await Payment.create({
         userId: req.user.id,
         method,
         amount: Number(amount),
-        screenshot: req.file?.filename,
+        screenshotUrl,
+        screenshotPublicId,
+        // keep old 'screenshot' null by default (for backward compat)
       });
 
       res.status(201).json({ message: "Payment uploaded", payment });
@@ -119,13 +139,25 @@ router.post(
   async (req, res) => {
     try {
       const { upiId } = req.body;
-      const qrImage = req.file?.filename;
 
       let settings = await Settings.findOne();
       if (!settings) settings = new Settings();
 
       if (upiId) settings.upiId = upiId;
-      if (qrImage) settings.qrImage = qrImage;
+
+      if (req.file?.buffer) {
+        // delete old QR if exists
+        if (settings.qrImagePublicId) {
+          await deleteFromCloudinary(settings.qrImagePublicId);
+        }
+        const result = await uploadBufferToCloudinary(
+          req.file.buffer,
+          "roi-mern/qr"
+        );
+        settings.qrImageUrl = result.secure_url;
+        settings.qrImagePublicId = result.public_id;
+        // old 'qrImage' filename can stay as is (unused for new uploads)
+      }
 
       await settings.save();
       res.json({ message: "Payment method saved", settings });

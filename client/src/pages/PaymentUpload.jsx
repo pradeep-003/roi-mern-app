@@ -41,7 +41,14 @@ function PaymentUpload() {
               UPI: <span className="font-mono">{payInfo.upiId}</span>
             </p>
           )}
-          {payInfo.qrImage && (
+          {payInfo?.qrImageUrl && (
+            <img
+              src={payInfo.qrImageUrl}
+              alt="QR"
+              className="w-48 border rounded"
+            />
+          )}
+          {!payInfo?.qrImageUrl && payInfo?.qrImage && (
             <img
               src={`http://localhost:5000/uploads/${payInfo.qrImage}`}
               alt="QR"

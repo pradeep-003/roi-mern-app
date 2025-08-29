@@ -51,13 +51,22 @@ function ManagePayments() {
                 <p>
                   <strong>Status:</strong> {p.status}
                 </p>
-                {p.screenshot && (
+                {p.screenshotUrl && (
+                  <img
+                    src={p.screenshotUrl}
+                    alt="screenshot"
+                    className="w-40 mt-2 rounded border"
+                  />
+                )}
+                {/* Fallback for old records (optional) */}
+                {!p.screenshotUrl && p.screenshot && (
                   <img
                     src={`http://localhost:5000/uploads/${p.screenshot}`}
                     alt="screenshot"
                     className="w-40 mt-2 rounded border"
                   />
                 )}
+
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => updateStatus(p._id, "approved")}

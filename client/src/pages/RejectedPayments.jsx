@@ -31,12 +31,18 @@ const RejectedPayments = () => {
               <td className="border p-2">₹{p.amount}</td>
               <td className="border p-2">
                 <a
-                  href={`http://localhost:5000/uploads/${p.screenshot}`}
+                  href={
+                    p.screenshotUrl ||
+                    `http://localhost:5000/uploads/${p.screenshot}`
+                  }
                   target="_blank"
                   rel="noreferrer"
                 >
                   <img
-                    src={`http://localhost:5000/uploads/${p.screenshot}`}
+                    src={
+                      p.screenshotUrl ||
+                      `http://localhost:5000/uploads/${p.screenshot}`
+                    }
                     alt="screenshot"
                     className="h-12 mx-auto"
                   />
