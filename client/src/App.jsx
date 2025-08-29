@@ -129,7 +129,7 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/roi-mern-app">
         <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
