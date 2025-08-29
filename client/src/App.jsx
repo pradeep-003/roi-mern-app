@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext, AuthProvider } from "./context/AuthContext";
 
@@ -20,11 +20,11 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* User Protected Routes */}
+      {/* User */}
       <Route
         path="/dashboard"
         element={
@@ -52,7 +52,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Admin Protected Routes */}
+      {/* Admin */}
       <Route
         path="/admin"
         element={
@@ -120,7 +120,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Default Route */}
+      {/* Default */}
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
@@ -129,7 +129,9 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
     </AuthProvider>
   );
 }
