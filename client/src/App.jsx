@@ -15,7 +15,7 @@ import ApprovedPayments from "./pages/ApprovedPayments";
 import RejectedPayments from "./pages/RejectedPayments";
 import ManageWithdraws from "./pages/ManageWithdraws";
 
-function AppRoutes() {
+function App() {
   const { token, role } = useContext(AuthContext);
 
   return (
@@ -123,16 +123,6 @@ function AppRoutes() {
       {/* Default */}
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
-  );
-}
-
-function App() {
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
   );
 }
 
