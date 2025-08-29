@@ -19,7 +19,7 @@ function AppRoutes() {
   const { token, role } = useContext(AuthContext);
 
   return (
-    <Routes basename="/">
+    <Routes>
       {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
