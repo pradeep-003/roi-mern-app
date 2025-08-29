@@ -19,7 +19,7 @@ function AppRoutes() {
   const { token, role } = useContext(AuthContext);
 
   return (
-    <Routes>
+    <Routes basename="/roi-mern-app">
       {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -129,7 +129,7 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter basename="/roi-mern-app">
+      <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
