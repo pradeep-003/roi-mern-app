@@ -9,7 +9,6 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-// NEW: auto-logout on 401/403
 API.interceptors.response.use(
   (res) => res,
   (err) => {

@@ -17,7 +17,6 @@ function ManagePayments() {
     try {
       await API.put(`/payments/${id}/status`, { status });
 
-      // ✅ Remove from list instantly
       setPayments((prev) => prev.filter((p) => p._id !== id));
 
       alert(`✅ Payment ${status}`);

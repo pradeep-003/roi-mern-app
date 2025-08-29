@@ -8,7 +8,7 @@ function AdminDashboard() {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleLogout = () => {
-    logout(); // clears context + localStorage
+    logout();
     navigate("/login", { replace: true });
   };
   return (

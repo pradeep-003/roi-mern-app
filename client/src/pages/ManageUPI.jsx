@@ -6,7 +6,6 @@ function ManageUPI() {
   const [qrFile, setQrFile] = useState(null);
   const [settings, setSettings] = useState(null);
 
-  // Load existing UPI/QR
   useEffect(() => {
     API.get("/payments/method").then((res) => {
       if (res.data) {
@@ -28,7 +27,6 @@ function ManageUPI() {
     alert("✅ UPI/QR updated successfully!");
     setQrFile(null);
 
-    // Refresh data
     const res = await API.get("/payments/method");
     setSettings(res.data);
   };

@@ -17,7 +17,6 @@ function ManageWithdraws() {
     try {
       await API.put(`/withdraw/${id}/status`, { status });
 
-      // ✅ Remove from list instantly
       setRequests((prev) => prev.filter((r) => r._id !== id));
 
       alert(`✅ Withdraw ${status}`);
@@ -32,7 +31,7 @@ function ManageWithdraws() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {requests
-          .filter((w) => w.status === "pending") // ✅ only pending
+          .filter((w) => w.status === "pending")
           .map((w) => (
             <div key={w._id} className="bg-white shadow-md p-4 rounded-lg mb-4">
               <p>

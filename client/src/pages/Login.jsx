@@ -13,7 +13,6 @@ function Login() {
       const res = await API.post("/auth/login", form);
       const { token, role } = res.data;
 
-      // update context + localStorage
       login(token, role);
 
       if (role === "admin") navigate("/admin");

@@ -14,7 +14,6 @@ function UserDashboard() {
   const [roiData, setRoiData] = useState([]);
   const [buyAmount, setBuyAmount] = useState({}); // { [stockId]: amount }
 
-  // 🔹 Buy Stock
   const buyStock = async (stockId) => {
     const amount = Number(buyAmount[stockId] || 0);
     if (!amount || amount <= 0) return alert("Enter a valid amount");
@@ -22,7 +21,6 @@ function UserDashboard() {
     try {
       await API.post(`/stocks/buy/${stockId}`, { amount });
 
-      // refresh wallet & ROI
       const u = await API.get("/users/me");
       setWallet(u.data?.walletBalance || 0);
       const roi = await API.get("/roi");
@@ -35,13 +33,11 @@ function UserDashboard() {
     }
   };
 
-  // 🔹 Sell Stock
   const sellStock = async (stockId, amount) => {
     try {
       const res = await API.post(`/stocks/sell/${stockId}`, { amount });
       alert(res.data.message);
 
-      // refresh wallet & ROI
       const u = await API.get("/users/me");
       setWallet(u.data?.walletBalance || 0);
       const roi = await API.get("/roi");
@@ -51,7 +47,6 @@ function UserDashboard() {
     }
   };
 
-  // 🔹 Initial Data Fetch
   useEffect(() => {
     API.get("/users/me").then((res) => setWallet(res.data?.walletBalance || 0));
     API.get("/stocks").then((res) => setStocks(res.data));
@@ -60,9 +55,8 @@ function UserDashboard() {
       .catch(() => setRoiData([]));
   }, []);
 
-  // 🔹 Logout
   const handleLogout = () => {
-    logout(); // clears context + localStorage
+    logout();
     navigate("/login", { replace: true });
   };
 
