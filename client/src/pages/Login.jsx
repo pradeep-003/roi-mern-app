@@ -28,28 +28,36 @@ function Login() {
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          className="w-full border p-3 rounded mb-4"
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          className="w-full border p-3 rounded mb-6"
-        />
-
-        <button
-          onClick={handleLogin}
-          className="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600"
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
         >
-          Login
-        </button>
+          <input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className="w-full border p-3 rounded mb-4"
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            className="w-full border p-3 rounded mb-6"
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-green-500 text-white py-3 rounded hover:bg-green-600"
+          >
+            Login
+          </button>
+        </form>
+
         <p className="text-center mt-4 ">
           Don't have an account?{" "}
           <a href="/register" className="text-blue-500">
