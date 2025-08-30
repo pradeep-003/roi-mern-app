@@ -6,14 +6,13 @@ import { calculateROI } from "../utils/roiCalculator.js";
 
 const router = express.Router();
 
-// Get user investments with ROI
 router.get("/", authMiddleware(["user"]), async (req, res) => {
   try {
     const transactions = await Transaction.find({
       userId: req.user.id,
       type: "buy",
       status: "completed",
-      sold: false, // 🆕 only active ones
+      sold: false,
     }).populate("stockId");
 
     const result = transactions.map((t) => {
@@ -23,7 +22,7 @@ router.get("/", authMiddleware(["user"]), async (req, res) => {
         t.purchaseDate
       );
       return {
-        stockId: t.stockId._id, // 🆕 needed for sell
+        stockId: t.stockId._id,
         stock: t.stockId.name,
         amount: t.amount,
         roiPercentage: t.stockId.roiPercentage,

@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     walletBalance: { type: Number, default: 0 },
     role: { type: String, enum: ["user", "admin"], default: "user" },
-    kyc: { type: String }, // optional field, store KYC doc path or status
+    kyc: { type: String },
   },
   { timestamps: true }
 );

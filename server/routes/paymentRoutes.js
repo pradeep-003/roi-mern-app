@@ -15,7 +15,6 @@ import {
 
 const router = express.Router();
 
-// -------- Multer storage (screenshots + QR) ----------
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) =>
@@ -31,7 +30,6 @@ const upload = multer({
   },
 });
 
-// -------- USER: Upload payment screenshot ----------
 router.post(
   "/upload",
   authMiddleware(["user"]),
@@ -61,7 +59,6 @@ router.post(
         amount: Number(amount),
         screenshotUrl,
         screenshotPublicId,
-        // keep old 'screenshot' null by default (for backward compat)
       });
 
       res.status(201).json({ message: "Payment uploaded", payment });
@@ -71,7 +68,6 @@ router.post(
   }
 );
 
-// -------- ADMIN: List all payments ----------
 router.get("/", authMiddleware(["admin"]), async (req, res) => {
   try {
     const payments = await Payment.find()
@@ -83,14 +79,12 @@ router.get("/", authMiddleware(["admin"]), async (req, res) => {
   }
 });
 
-// -------- ADMIN: Approve/Reject + wallet credit on approve ----------
 router.put("/:id/status", authMiddleware(["admin"]), async (req, res) => {
   try {
-    const { status } = req.body; // 'approved' | 'rejected'
+    const { status } = req.body;
     const payment = await Payment.findById(req.params.id);
     if (!payment) return res.status(404).json({ message: "Payment not found" });
 
-    // Idempotency: avoid double processing
     if (payment.processed) {
       return res.json({ message: "Already processed", payment });
     }
@@ -101,11 +95,9 @@ router.put("/:id/status", authMiddleware(["admin"]), async (req, res) => {
     if (status === "approved") {
       payment.approvedAt = new Date();
 
-      // ✅ Fetch user first
       const user = await User.findById(payment.userId);
       if (!user) return res.status(404).json({ message: "User not found" });
 
-      // ✅ Create transaction
       await Transaction.create({
         userId: user._id,
         amount: payment.amount,
@@ -113,7 +105,6 @@ router.put("/:id/status", authMiddleware(["admin"]), async (req, res) => {
         status: "completed",
       });
 
-      // ✅ Credit wallet
       user.walletBalance = (user.walletBalance || 0) + Number(payment.amount);
       await user.save();
     }
@@ -131,7 +122,6 @@ router.put("/:id/status", authMiddleware(["admin"]), async (req, res) => {
   }
 });
 
-// -------- ADMIN: Set UPI/QR (create or update) ----------
 router.post(
   "/method",
   authMiddleware(["admin"]),
@@ -146,7 +136,6 @@ router.post(
       if (upiId) settings.upiId = upiId;
 
       if (req.file?.buffer) {
-        // delete old QR if exists
         if (settings.qrImagePublicId) {
           await deleteFromCloudinary(settings.qrImagePublicId);
         }
@@ -156,7 +145,6 @@ router.post(
         );
         settings.qrImageUrl = result.secure_url;
         settings.qrImagePublicId = result.public_id;
-        // old 'qrImage' filename can stay as is (unused for new uploads)
       }
 
       await settings.save();
@@ -167,7 +155,6 @@ router.post(
   }
 );
 
-// -------- PUBLIC/USER: Get current UPI/QR for display ----------
 router.get("/method", async (req, res) => {
   try {
     const settings = await Settings.findOne();
@@ -177,9 +164,6 @@ router.get("/method", async (req, res) => {
   }
 });
 
-// routes/paymentRoutes.js
-
-// GET approved payments
 router.get("/approved", authMiddleware(["admin"]), async (req, res) => {
   try {
     const payments = await Payment.find({ status: "approved" }).populate(
@@ -192,7 +176,6 @@ router.get("/approved", authMiddleware(["admin"]), async (req, res) => {
   }
 });
 
-// GET rejected payments
 router.get("/rejected", authMiddleware(["admin"]), async (req, res) => {
   try {
     const payments = await Payment.find({ status: "rejected" }).populate(

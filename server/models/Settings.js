@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const settingsSchema = new mongoose.Schema(
   {
     upiId: { type: String },
-    qrImage: { type: String }, // old local filename (fallback)
-    qrImageUrl: { type: String }, // NEW
+    qrImage: { type: String },
+    qrImageUrl: { type: String },
     qrImagePublicId: { type: String },
   },
   { timestamps: true }

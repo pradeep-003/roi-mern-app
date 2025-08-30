@@ -6,7 +6,6 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-// ADMIN: Add new stock
 router.post("/add", authMiddleware(["admin"]), async (req, res) => {
   try {
     const { name, price, roiPercentage } = req.body;
@@ -17,7 +16,6 @@ router.post("/add", authMiddleware(["admin"]), async (req, res) => {
   }
 });
 
-// ADMIN: Edit stock
 router.put("/:id", authMiddleware(["admin"]), async (req, res) => {
   try {
     const stock = await Stock.findByIdAndUpdate(req.params.id, req.body, {
@@ -29,7 +27,6 @@ router.put("/:id", authMiddleware(["admin"]), async (req, res) => {
   }
 });
 
-// ADMIN: Delete stock
 router.delete("/:id", authMiddleware(["admin"]), async (req, res) => {
   try {
     await Stock.findByIdAndDelete(req.params.id);
@@ -39,7 +36,6 @@ router.delete("/:id", authMiddleware(["admin"]), async (req, res) => {
   }
 });
 
-// USER: Get all active stocks
 router.get("/", authMiddleware(), async (req, res) => {
   try {
     const stocks = await Stock.find({ isActive: true });
@@ -49,11 +45,6 @@ router.get("/", authMiddleware(), async (req, res) => {
   }
 });
 
-// routes/stockRoutes.js (patch for buy/sell handlers)
-
-// ... existing add/edit/delete/get routes remain ...
-
-// USER: Buy stock (immediate completion if funds available)
 router.post("/buy/:stockId", authMiddleware(["user"]), async (req, res) => {
   try {
     const { amount } = req.body;
@@ -68,11 +59,9 @@ router.post("/buy/:stockId", authMiddleware(["user"]), async (req, res) => {
     if ((user.walletBalance || 0) < Number(amount))
       return res.status(400).json({ message: "Insufficient wallet balance" });
 
-    // debit wallet
     user.walletBalance = (user.walletBalance || 0) - Number(amount);
     await user.save();
 
-    // record transaction as completed
     const transaction = await Transaction.create({
       userId: req.user.id,
       stockId,
@@ -92,8 +81,6 @@ router.post("/buy/:stockId", authMiddleware(["user"]), async (req, res) => {
   }
 });
 
-// USER: Sell stock (credit wallet with principal + ROI profit)
-// USER: Sell stock (credit wallet with principal + ROI profit)
 router.post("/sell/:stockId", authMiddleware(["user"]), async (req, res) => {
   try {
     const { amount } = req.body;
@@ -105,13 +92,12 @@ router.post("/sell/:stockId", authMiddleware(["user"]), async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // 🔍 Find a matching unsold buy transaction
     const buyTxn = await Transaction.findOne({
       userId: req.user.id,
       stockId,
       type: "buy",
       status: "completed",
-      sold: false, // 🆕 only active investments
+      sold: false,
     }).sort({ createdAt: 1 });
 
     if (!buyTxn) {
@@ -130,15 +116,12 @@ router.post("/sell/:stockId", authMiddleware(["user"]), async (req, res) => {
 
     const totalCredit = buyTxn.amount + Number(profit);
 
-    // ✅ Credit wallet
     user.walletBalance = (user.walletBalance || 0) + totalCredit;
     await user.save();
 
-    // Mark buy transaction as sold
-    buyTxn.sold = true; // 🆕
+    buyTxn.sold = true;
     await buyTxn.save();
 
-    // Record sell transaction
     const sellTxn = await Transaction.create({
       userId: req.user.id,
       stockId,

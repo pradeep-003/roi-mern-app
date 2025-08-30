@@ -28,21 +28,21 @@ function AdminDashboard() {
           to="/admin/stocks"
           className="bg-blue-500 text-white p-6 rounded-xl shadow hover:bg-blue-600 text-center font-semibold"
         >
-          📈 Manage Stocks
+          Manage Stocks
         </Link>
 
         <Link
           to="/admin/withdraws"
           className="bg-yellow-500 text-white p-6 rounded-xl shadow hover:bg-yellow-600 text-center font-semibold"
         >
-          💸 Manage Withdrawals
+          Manage Withdrawals
         </Link>
 
         <Link
           to="/admin/payments"
           className="bg-green-500 text-white p-6 rounded-xl shadow hover:bg-green-600 text-center font-semibold"
         >
-          💳 Manage Payments
+          Manage Payments
         </Link>
 
         <Link
@@ -62,7 +62,7 @@ function AdminDashboard() {
           to="/admin/upi"
           className="bg-purple-500 text-white p-6 rounded-xl shadow hover:bg-purple-600 text-center font-semibold"
         >
-          🏦 Manage UPI/QR
+          Manage UPI/QR
         </Link>
       </div>
     </div>

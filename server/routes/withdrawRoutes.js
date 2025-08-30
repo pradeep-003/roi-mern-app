@@ -7,7 +7,6 @@ import Transaction from "../models/Transaction.js"; // ✅ FIX ADDED
 
 const router = express.Router();
 
-// USER: Request withdraw
 router.post(
   "/",
   authMiddleware(["user"]),
@@ -26,7 +25,6 @@ router.post(
         return res.status(400).json({ message: "Insufficient wallet balance" });
       }
 
-      // 🔐 Lock funds immediately
       user.walletBalance -= amount;
       await user.save();
 
@@ -35,7 +33,6 @@ router.post(
         amount,
       });
 
-      // Record pending withdraw transaction
       await Transaction.create({
         userId: user._id,
         amount,
@@ -52,7 +49,6 @@ router.post(
   }
 );
 
-// ADMIN: Get all withdraw requests
 router.get("/", authMiddleware(["admin"]), async (req, res) => {
   const requests = await Withdraw.find()
     .sort({ createdAt: -1 })
@@ -60,7 +56,6 @@ router.get("/", authMiddleware(["admin"]), async (req, res) => {
   res.json(requests);
 });
 
-// ADMIN: Approve/Reject
 router.put("/:id/status", authMiddleware(["admin"]), async (req, res) => {
   const { status } = req.body;
   const withdraw = await Withdraw.findById(req.params.id);
@@ -70,7 +65,6 @@ router.put("/:id/status", authMiddleware(["admin"]), async (req, res) => {
 
   withdraw.status = status;
 
-  // find the related withdraw transaction
   const txn = await Transaction.findOne({
     userId: withdraw.userId,
     amount: withdraw.amount,
@@ -93,7 +87,6 @@ router.put("/:id/status", authMiddleware(["admin"]), async (req, res) => {
       withdraw,
     });
   } else if (status === "rejected") {
-    // refund wallet
     const user = await User.findById(withdraw.userId);
     user.walletBalance += withdraw.amount;
     await user.save();

@@ -19,7 +19,7 @@ const transactionSchema = new mongoose.Schema(
       enum: ["pending", "completed", "refunded"],
       default: "pending",
     },
-    sold: { type: Boolean, default: false }, // 🆕 NEW FIELD
+    sold: { type: Boolean, default: false },
     paymentScreenshot: { type: String },
     purchaseDate: { type: Date, default: Date.now },
   },
